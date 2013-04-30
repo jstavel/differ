@@ -26,6 +26,7 @@ public class ImageProcessorTest {
 
     @Test
     public void testImages() throws ImageDifferException, IOException {
+	// FIX: Z - this should be universal path
 	File dir = new File("/home/xrosecky/differ");
 	Map<File, ImageProcessorResult> images = new HashMap<File, ImageProcessorResult>();
 	for (File file : dir.listFiles()) {
