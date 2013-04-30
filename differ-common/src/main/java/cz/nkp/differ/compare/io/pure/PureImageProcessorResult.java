@@ -101,6 +101,4 @@ public class PureImageProcessorResult implements ImageProcessorResult {
     public List<ImageMetadata> getMetadata() {
 	return metadata;
     }
-
-
 }

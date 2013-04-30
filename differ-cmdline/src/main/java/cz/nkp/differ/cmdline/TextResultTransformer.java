@@ -82,72 +82,76 @@ public class TextResultTransformer implements ResultTransformer{
         Set<String> characterizationProperties = (Set<String>) context.getBean("characterizationProperties");
 
         /* save special elements */
-        for(ImageMetadata metadata: metadataList){
+        for(ImageMetadata metadata: metadataList) {
             String key = metadata.getKey();
-            if(key.equalsIgnoreCase("Histogram")){
+            if( key.equalsIgnoreCase("Histogram") ){
                 saveHistogram(metadata);
+                continue;
+            }
+            if( key.equalsIgnoreCase("Clipping path") ){
+                saveClippingPath(metadata);
+                continue;
+            }
+            if( key.equalsIgnoreCase("Colormap") ){
+                saveColorMap(metadata);
+                continue;
+            }
+            if( identificationProperties.contains(key) ){
+                identificationMetadata.add(metadata);
+                continue;
+            }
+            if( validationProperties.contains(key) ){
+                validationMetadata.add(metadata);
+                continue;
+            }
+            if( characterizationProperties.contains(key) ){
+                characterizationMetadata.add(metadata);
+                continue;
+            }
+            if( extractorProperties.contains(key) ){
+                extractorMetadata.add(metadata);
+                continue;
             } else {
-                if( key.equalsIgnoreCase("Clipping path")){
-                    saveClippingPath(metadata);
-                } else {
-                    if (key.equalsIgnoreCase("Colormap")){
-                        saveColorMap(metadata);
-                    } else {
-                        if( identificationProperties.contains(key)){
-                            identificationMetadata.add(metadata);
-                        } else {
-                            if(validationProperties.contains(key)){
-                                validationMetadata.add(metadata);
-                            } else {
-                                if( characterizationProperties.contains(key)){
-                                    characterizationMetadata.add(metadata);
-                                } else {
-                                    if( extractorProperties.contains(key)){
-                                        extractorMetadata.add(metadata);
-                                    } else {
-                                        otherMetadata.add(metadata);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                otherMetadata.add(metadata);
+                continue;
             }
         }
-        String output = "";
-        output += "Used extractors\n";
-        output += "===============\n\n";
-        output += reportMetadataList(extractorMetadata);
+        
+        // FIX: give some better initial capacity
+        StringBuilder output = new StringBuilder(200000);
+        output.append("Used extractors\n");
+        output.append("===============\n\n");
+        output.append(reportMetadataList(extractorMetadata));
 
-        output += "\nIdentification";
-        output += "\n==============\n\n";
-        output += String.format("%s: %sx%s\n\n",file.getName(),result.getWidth(),result.getHeight());
-        output += reportMetadataList(identificationMetadata);
+        output.append("\nIdentification");
+        output.append("\n==============\n\n");
+        output.append(String.format("%s: %sx%s\n\n",file.getName(),result.getWidth(),result.getHeight()));
+        output.append(reportMetadataList(identificationMetadata));
 
-        output += "\nValidation";
-        output += "\n==========\n\n";
-        output += reportMetadataList(validationMetadata);
+        output.append("\nValidation");
+        output.append("\n==========\n\n");
+        output.append(reportMetadataList(validationMetadata));
 
-        output += "\nCharacterization";
-        output += "\n================\n\n";
-        output += reportMetadataList(characterizationMetadata);
+        output.append("\nCharacterization");
+        output.append("\n================\n\n");
+        output.append(reportMetadataList(characterizationMetadata));
 
-        output += "\nOther properties";
-        output += "\n================\n\n";
-        output += reportMetadataList(otherMetadata);
+        output.append("\nOther properties");
+        output.append("\n================\n\n");
+        output.append(reportMetadataList(otherMetadata));
 
         if( this.includeOutputs ){
-            output += "\nRaw outputs of extractors";
-            output += "\n=========================\n\n";
-            for(ImageMetadata metadata: result.getMetadata()){
+            output.append("\nRaw outputs of extractors");
+            output.append("\n=========================\n\n");
+            for( ImageMetadata metadata: result.getMetadata() ){
                 if( metadata.getKey().equals("exit-code") ){
                     File outFile = this.outputNamer.rawOutputName(file, result,metadata.getSource().toString());
                     FileWriter writer;
                     try {
-                        output += String.format("   %-10s   'output <%s>'_\n",
+                        output.append(String.format("   %-10s   'output <%s>'_\n",
                                 metadata.getSource().toString(),
                                 outFile
-                        );
+                        ));
                         writer = new FileWriter(outFile);
                         writer.write(metadata.getSource().getStdout());
                         writer.close();
@@ -157,10 +161,10 @@ public class TextResultTransformer implements ResultTransformer{
                     File errorOutputFile = this.outputNamer.rawErrorOutputName(file, result,metadata.getSource().toString());
                     writer = null;
                     try {
-                        output += String.format("   %-10s   'stderr output <%s>'_\n",
+                        output.append(String.format("   %-10s   'stderr output <%s>'_\n",
                                 metadata.getSource().toString(),
                                 outFile
-                        );
+                        ));
                         writer = new FileWriter(errorOutputFile);
                         writer.write(metadata.getSource().getStderr());
                         writer.close();
@@ -171,22 +175,22 @@ public class TextResultTransformer implements ResultTransformer{
             }
         }
         if( this.saveReport ){
-            output += "\nText report";
-            output += "\n===========\n";
-            output += String.format("\n  `text report <%s>`_\n", this.outputNamer.textName(file, result));
+            output.append("\nText report");
+            output.append("\n===========\n");
+            output.append(String.format("\n  `text report <%s>`_\n", this.outputNamer.textName(file, result)));
 
-            output += "\nReport for web";
-            output += "\n==============\n";
-            output += String.format("\n  `web report <%s>`_\n", this.outputNamer.reportName(file, result));
+            output.append("\nReport for web");
+            output.append("\n==============\n");
+            output.append(String.format("\n  `web report <%s>`_\n", this.outputNamer.reportName(file, result)));
         }
         if( this.saveProperties ){
-            output += "\nUsed significant properties";
-            output += "\n===========================\n";
-            output += String.format("\n  `used properties <%s>`_",
+            output.append("\nUsed significant properties");
+            output.append("\n===========================\n");
+            output.append(String.format("\n  `used properties <%s>`_",
                         this.outputNamer.propertiesSummaryName(file, result)
-            );
+            ));
         }
-        return output;
+        return output.toString();
     }
 
     public String reportMetadataList(List<ImageMetadata> metadataList){
@@ -226,34 +230,35 @@ public class TextResultTransformer implements ResultTransformer{
             }
         });
         TheSameValueHider propertyNameHider = new TheSameValueHider();
-        String output = "";
+        StringBuilder output = new StringBuilder(200000);
         String format = String.format("%%-%ds %%-%ds  %%-%ds\n", keyLength, sourceLength,valueLength);
         String formatWithUnit = String.format("%%-%ds %%s", valueWithUnitLength );
-        output += String.format(format, "Significant Property", "Source", "Value");
-        output += String.format(format,
+        output.append(String.format(format, "Significant Property", "Source", "Value"));
+        output.append(String.format(format,
                 getStringGivenLength(keyLength,'-'),
                 getStringGivenLength(sourceLength,'-'),
-                getStringGivenLength(valueLength,'-'));
+                getStringGivenLength(valueLength,'-')));
 
         for (ImageMetadata metadata: metadataList) {
-            output += String.format(format,
+            output.append(String.format(format,
                     propertyNameHider.getOrHide(metadata.getKey()),
                     metadata.getSource(),
                     metadata.getUnit() != null ? String.format(formatWithUnit,metadata.getValue(),
                                                                metadata.getUnit()) :
                             metadata.getValue()
-                    );
+                    ));
         }
-        output += String.format(format,
+        output.append(String.format(format,
                 getStringGivenLength(keyLength,'-'),
                 getStringGivenLength(sourceLength,'-'),
                 getStringGivenLength(valueLength,'-'),
-                getStringGivenLength(unitLength, '-'));
+                getStringGivenLength(unitLength, '-')));
 
-        return output;
+        return output.toString();
     }
 
     private void saveHistogram(ImageMetadata metadata){
+            // It's scheduled.
            /* Todo: doplnit ukladani histogramu do souboru */
     }
 

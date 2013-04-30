@@ -39,6 +39,8 @@ public class ExternalImageProcessor extends PureImageProcessor {
 	    Map<String, String> attributes = new HashMap<String, String>();
 	    attributes.put("{file1}", a.getAbsolutePath());
 	    attributes.put("{file2}", b.getAbsolutePath());
+	    
+	    // TODO: Z - use MetadataTable
 	    List<ImageMetadata> metadata = extractor.getMetadata(attributes);
 	    result[2].getMetadata().addAll(metadata);
 	}

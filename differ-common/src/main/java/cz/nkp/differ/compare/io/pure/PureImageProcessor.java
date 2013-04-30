@@ -156,6 +156,8 @@ public class PureImageProcessor extends ImageProcessor {
         results[1] = this.processImage(b, null);
         try {
             BufferedImage compareFull = getImagesDifference(results[0].getFullImage(), results[1].getFullImage());
+            // TODO: Z - add correlation to compare output
+            int[] corr = computeCorrelation(results[0].getHistogram(), results[1].getHistogram());
             java.awt.Image comparePreview = ImageManipulator.getBitmapScaledImage(compareFull, this.getConfig().getImageWidth(), true);
             PureImageProcessorResult result = new PureImageProcessorResult(compareFull, comparePreview);
             result.setType(ImageProcessorResult.Type.COMPARISON);
@@ -248,6 +250,20 @@ public class PureImageProcessor extends ImageProcessor {
         return result;
     }
 
+    /**
+     * Computer correlation between two histograms for each color.
+     * Described here: http://home.zcu.cz/~friesl/hpsb/cor.html
+     * 
+     * @param hist1 Histogram for the first image
+     * @param hist2 Histogram for the second image
+     * @return correlation value for each color channel
+     */
+    private static int[] computeCorrelation(int[][] hist1, int[][] hist2) {
+        int[] result = {1, 1, 1};
+        
+        return result;
+    }
+    
     private static BufferedImage getImagesDifference(BufferedImage image1, BufferedImage image2) {
         if (image1 == null) {
             throw new NullPointerException("image1");
