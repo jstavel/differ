@@ -1,23 +1,14 @@
 package cz.nkp.differ.cmdline;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.http.HttpResponse;
-import org.apache.http.auth.AuthState;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.auth.params.AuthPNames;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.params.AuthPolicy;
-import org.apache.http.client.protocol.ClientContext;
-import org.apache.http.entity.FileEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.protocol.BasicHttpContext;
-import org.apache.http.protocol.HttpContext;
-
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.FileEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 
 /**
  * Created with IntelliJ IDEA.
@@ -54,7 +45,8 @@ public class ReportHTTPSender {
         HttpPost httpPost = new HttpPost(this.url);
         HttpClient client = new DefaultHttpClient();
 
-        String basic_auth = new String(Base64.encodeBase64((user + ":" + password).getBytes()));
+        // TODO: Z - Beter security may be better. Web app should be changed accordingly. 
+        String basic_auth = new String(DigestUtils.md5((user + ":" + password).getBytes()));
         httpPost.addHeader("Authorization", "Basic " + basic_auth);
 
         FileEntity input = new FileEntity(report);

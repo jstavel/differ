@@ -113,6 +113,8 @@ public class ExternalMetadataExtractor extends AbstractMetadataExtractor {
                         String unit = units.get(entry.getKey());
                         metadata.setUnit(unit);
                     }
+                    
+                    // TODO: add to the MetadataTable hash by entry.getKey()
                     result.add(metadata);
                 }
             }

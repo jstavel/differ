@@ -30,5 +30,6 @@ public interface ImageProcessorResult {
 
     public int getHeight();
 
+    // TODO: Z - replace simple List by MetadataTable
     public List<ImageMetadata> getMetadata();
 }
